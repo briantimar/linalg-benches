@@ -1,5 +1,6 @@
 naive1: naive1.c
 	gcc naive1.c -g -o builds/naive1
+	gcc naive1.c -S -o builds/naive.asm
 
 # addv_sse1.S: addv_sse1.c
 # 	gcc -S addv_sse1.c -o addv_sse1.S
