@@ -33,12 +33,14 @@ void fillarray(floattype v[], int size, floattype maxabs) {
     }
 }
 
-timetype benchmark(int nsamp, floattype*v1, floattype* v2, int size, floattype maxabs){
+//measure the time it takes to perform <nsamp> in-place vector additions
+// size: the length of each vector
+// returns: average time per addv call.
+timetype benchmark(int nsamp, floattype*v1, floattype* v2, int size){
     timetype t = 0.0;
     struct timeval t1, t2;
     int i;
-    fillarray(v1, size, maxabs);
-    fillarray(v2, size, maxabs);
+
     gettimeofday(&t1, NULL);
     for (i=0; i< nsamp; i++) {
         addv(v1, v2, size);
@@ -55,8 +57,8 @@ int main(int argc, char* argv[]) {
     timetype t;
     int r1, r2;
     
-    if (argc != 3){
-        fprintf(stderr, "usage: %s size nsamp\n", argv[0]);
+    if (argc != 4){
+        fprintf(stderr, "usage: %s size nsamp outfile\n", argv[0]);
         exit(1);
     }
 
@@ -71,13 +73,12 @@ int main(int argc, char* argv[]) {
     fillarray(v1, size, maxabs);
     fillarray(v2, size, maxabs);
 
-    printf("Size of float type: %lu\n", sizeof(floattype));
-    printf("Number of samples: %d\n", nsamp);
-    printf("Vector size: %d\n", size);
-    t = benchmark(nsamp, v1, v2, size, maxabs);
-    printf("Average time per vector: %.6e s\n", t);
-    printf("Average time per entry: %.6e s\n", t/((timetype) nsamp));
-
+    t = benchmark(nsamp, v1, v2, size);
+    
+    FILE* f = fopen(argv[3], "a");
+    fprintf(f, "%d %d %.8e\n", size, nsamp, t);
+    fclose(f);
+    
     free(v1);
     free(v2);
     exit(0);
